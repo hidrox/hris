@@ -6,19 +6,9 @@
     "start": "node server.js"
   },
   "main": "server.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hidrox/hris.git"
-  },
   "keywords": [
     "hris"
   ],
-  "author": "fxr",
-  "license": "HAHA",
-  "bugs": {
-    "url": "https://github.com/hidrox/hris/issues"
-  },
-  "homepage": "https://github.com/hidrox/hris#readme",
   "dependencies": {
     "crypto-js": "^3.1.6",
     "good": "^6.4.0",
