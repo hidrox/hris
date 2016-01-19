@@ -28,7 +28,7 @@ const server=new Hapi.Server({
     }
   }
 });
-const server_port=process.env.OPENSHIFT_NODEJS_PORT;
+const server_port=process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT ;
 const server_host=process.env.OPENSHIFT_NODEJS_IP;
   server.connection({
     host:server_host,
