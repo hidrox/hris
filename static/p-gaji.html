@@ -1,0 +1,368 @@
+
+
+
+<!-- search -->
+<input id=PG-search class=PX-search type=text placeholder='Search..'>
+<div   id=PG-clear  class=PX-clear title='Clear search'>Clear</div>
+<div   id=PG-ruler  class=PX-ruler></div>
+
+<!-- data lists -->
+<div id=PGD></div>
+<div id=PGP class=PANEL_></div>
+<div id=PGS></div>
+<div class=PGS-panel></div>
+
+
+<script>
+
+/* vars.. */
+var __gaji=''
+
+
+/* MAIN */
+// document on keydown
+$(document).keydown(function(e){//DBG(e.which)
+  if(e.which===38){PG_selectUp();return false}
+  if(e.which===40){PG_selectDown();return false}
+  e.which===13&&!$('#PANEL').is(':visible')&&$('#PGD').children('.on').click()
+  e.which===37&&$('#PGP').is(':visible')&&$('.PGP-prev').click()
+  e.which===39&&$('#PGP').is(':visible')&&$('.PGP-next').click()
+  if(e.which===68&&e.ctrlKey){$('#LOG').toggleClass('on');return false}
+})
+
+
+// get active item ID
+function _xid3(){return $('#PGD').children('.on').attr('v')}
+
+// generate database ruler picker
+function PG_genRuler(){
+  var month=D.getMonth()+1
+  var year=D.getFullYear()
+  var h=''
+  var __Period=year+'_'+month
+  for(var i=1;i<13;i++){
+    h+='<d class=PX-ruler-d val="'+year+'_'+i+'" text="'+i+'" \
+           title="Showing data of '+fullMonth[i-1]+' '+year+'"></d>'
+  }
+  $('#PG-ruler')
+    .html(h+'<d class="PX-ruler-d PX-ruler-default" val="'+__Period+'" \
+                text=Default title="Show current month (default)"></d>')
+      .attr('val',year)
+      // click the month
+      .children().on('click',function(){
+          $(this).addClass('on in').siblings().removeClass('on in')
+          PUP($(this).attr('title'),1)
+          __Period=$(this).attr('val')
+          genGaji(__Period)
+        })
+      .parent().children(':eq('+(month-1)+')').click()
+} PG_genRuler()
+
+/*
+ * Search & Filter
+ * profile
+ */
+function PG_search(){
+  var pLen
+    // search
+    $('#PG-search')
+     .on('focus',function(){pLen=__gaji.length})
+     .on('input',function(){
+        var sRes=[]
+        var v=$(this).val().toLowerCase()
+        if(v.length>2){
+          // search in '__gaji'
+          for(var i=0;i<pLen;i++){
+            __gaji[i].toLowerCase().indexOf(v)>-1?
+            sRes.push(''+i):0 // get the match elm id
+          }
+          $('#PGD').children('d').removeClass('_s')
+          // hide all but ._
+          var sLen=sRes.length
+          for(var i=0;i<sLen;i++){
+            $('#PGI'+sRes[i]).addClass('_s')
+          }
+          $('#PGD').children('d').hide().siblings('._s').show()
+        }else{$('#PGD').children().show()}
+     })
+     // clear
+     $('#PG-clear').on('click',function(){
+        $('#PGD').children().show()
+        $('#PG-search').val('')
+     })
+} PG_search()
+
+
+
+/*
+ * Generate gaji list..
+ */
+function genGaji(month){
+  $.ajax({
+  type:'POST',
+  url:'/_get',
+  data:{type:'gaji/gaji-'+month},
+  success:function(r){
+  __gaji=r.split('^')
+  var h=''
+  var num=0
+  for(var i=0,len=__gaji.length;i<len;i++){
+    var d=__gaji[i].split('~')
+    if(d[0].length===8){
+      num++
+      h+='<d id="PGI'+i+'" class=PGD-d v="'+i+'">\
+             <e class="PGD-e no">'+num+'.</e>\
+             <e class="PGD-e nama">'+d[2]+'</e>\
+             <e class="PGD-e class">'+d[6]+'</e>\
+             <e class="PGD-e jabatan ellipsis">'+d[5]+'</e>\
+             <e class="PGD-e pokok">'+d[9]+'</e>\
+             <e class="PGD-e tunjangan">'+d[16]+'</e>\
+             <e class="PGD-e potongan">'+d[33]+'</e>\
+             <e class="PGD-e penerimaan">'+d[34]+'</e>\
+             <e class="PGD-e rek">'+d[42]+'</e>\
+          </d>'
+    }
+  }
+  var rowTitle='\
+          <t class="rowTitle profile">\
+            <t style="left:6px">No.</t>\
+            <t style="left:30px">Nama Karyawan</t>\
+            <t style="left:225px">Class</t>\
+            <t style="left:270px">Jabatan</t>\
+            <t style="left:477px">Gj.Pokok</t>\
+            <t style="left:545px">Tunjangan</t>\
+            <t style="left:625px">Potongan</t>\
+            <t style="left:700px">Penerimaan Bersih</t>\
+            <t style="left:800px">No.Rek</t>\
+          </t>'
+
+  $('#PGD').html(rowTitle+h).attr('text','Users ('+num+')')
+  
+  },statusCode:{
+      404:function(){
+        $('#PGD').html('<nodata/>')
+        PUP('No data found.')
+      }
+  },error:function(){
+    PUP('Connection error.')
+  } })
+
+}
+
+
+
+
+
+// Keyboard arow up >< down (select list item)
+function PG_selectUp(){
+    if($('#PANEL').is(':visible')&&!$('#PGP').is(':visible'))return false
+    var e=$('#PGD').children('.on:visible')
+        e.is(':first-child')?
+          $(document).scrollTop(0):
+          e.removeClass('on').prev().addClass('on')
+        e.offset().top-$(document).scrollTop()
+          <60&&$(document).scrollTop(e.position().top+70)
+
+}
+function PG_selectDown(){
+    if($('#PANEL').is(':visible')&&!$('#PGP').is(':visible'))return false
+    var e=$('#PGD').children('.on:visible')
+        e.is(':last-child')||e.removeClass('on').next().addClass('on')
+        e.offset().top>($(window).height()-60)&&$(document)
+         .scrollTop(e.position().top-($(window).height()-190))
+}
+
+
+
+
+
+
+
+/*
+ * Generate Preview..
+ */
+function PGP(el){
+  el.addClass('on').removeClass('New Updated').siblings().removeClass('on')
+  var name=el.children('.nama').text()
+  var elm=$('#PGP')
+  var d=__gaji[_xid3()].split('~')
+  var dLen=d.length
+  var num=0
+  var h=''
+  if(0==0){
+    num++
+    h+='<d class="PGP-data Gaji" style="display:block">\
+          <e class="PGP-data-e name" t="Nama">'+d[2]+'</e>\
+          <e class="PGP-data-e divisi" t="Divisi">'+d[4]+'</e>\
+          <e class="PGP-data-e class" t="Class/Status">'+d[6]+' '+d[3]+'</e>\
+          <e class="PGP-data-e jabatan" t="Jabatan">'+d[5]+'</e>\
+          <e class="PGP-data-e pokok" t="Gaji Pokok">'+d[9]+'</e>\
+          <e class="PGP-data-e tJabatan" t="Tunjangan Jabatan">'+d[10]+'</e>\
+          <e class="PGP-data-e tTransport" t="Tunjangan Transport">'+d[11]+'</e>\
+          <e class="PGP-data-e tKonsumsi" t="Tunjangan Konsumsi">'+d[12]+'</e>\
+          <e class="PGP-data-e tDaerah" t="Gaji Daerah">'+d[13]+'</e>\
+          <e class="PGP-data-e tDPLK" t="Tunjangan DPLK">'+d[14]+'</e>\
+          <e class="PGP-data-e tLain" t="Tunjangan Lain2">'+d[15]+'</e>\
+          <e class="PGP-data-e totTotal" t="Total Tunjangan">'+d[16]+'</e>\
+          <e class="PGP-data-e totPenUtama" t="Total Penerimaan Utama">'+d[17]+'</e>\
+\
+          <e class="PGP-data-e spd" t="SPD">'+d[18]+'</e>\
+          <e class="PGP-data-e bonusKTT" t="Bonus KTT">'+d[19]+'</e>\
+          <e class="PGP-data-e lembur" t="Lembur">'+d[20]+'</e>\
+          <e class="PGP-data-e enric" t="Enricment">'+d[21]+'</e>\
+          <e class="PGP-data-e ekskul" t="Ekskul Lain2">'+d[22]+'</e>\
+          <e class="PGP-data-e tTotalPenLain" t="Total Penerimaan Lain2">'+d[23]+'</e>\
+\
+          <e class="PGP-data-e pKoperasi" t="Potongan Koperasi">'+d[23]+'</e>\
+          <e class="PGP-data-e pKTT" t="Potongan KTT">'+d[24]+'</e>\
+          <e class="PGP-data-e pIuran" t="Potongan Iuran">'+d[25]+'</e>\
+          <e class="PGP-data-e pNatura" t="Potongan Natura">'+d[26]+'</e>\
+          <e class="PGP-data-e pZiswaf" t="Potongan Ziswaf">'+d[27]+'</e>\
+          <e class="PGP-data-e pDPLK" t="Potongan DPLK">'+d[28]+'</e>\
+          <e class="PGP-data-e pArisan" t="Potongan Arisan">'+d[29]+'</e>\
+          <e class="PGP-data-e pUM" t="Potongan UM">'+d[30]+'</e>\
+          <e class="PGP-data-e pLain" t="Potongan Lain2">'+d[31]+'</e>\
+          <e class="PGP-data-e totPotongan" t="Total Penerimaan Lain2">'+d[32]+'</e>\
+\
+          <e class="PGP-data-e totPenerimaan" t="Total Penerimaan">'+d[34]+'</e>\
+          <e class="PGP-data-e pembulatan" t="Pembulatan">'+d[35]+'</e>\
+          <e class="PGP-data-e penerimaanBersih" t="Penerimaan Bersih">'+d[36]+'</e>\
+          <e class="PGP-data-e takeHome" t="Take Home Pay">'+d[37]+'</e>\
+          <e class="PGP-data-e ket" t="Keterangan">'+d[38]+'</e>\
+          <e class="PGP-data-e tunaiPembayaran" t="Tunai">'+d[39]+'</e>\
+          <e class="PGP-data-e bankPembayaran" t="Via Bank">'+d[40]+'</e>\
+          <e class="PGP-data-e bankName" t="Bank Name">'+d[41]+'</e>\
+          <e class="PGP-data-e bankRek" t="No.Rek">'+d[42]+'</e>\
+          <e class="PGP-data-e bankAN" t="Atas Nama">'+d[43]+'</e>\
+        </d>'
+    h+='<d class=PGP-pic style="background-image:\
+           url(\'files/gaji_pic/'+name+'.jpg\')"></d>\
+        <d class=PGP-title>'+name+'</d>\
+        <d class=PGP-prev></d>\
+        <d class=PGP-next></d>\
+        <d class=PGP-tab>\
+          <e class="PGP-tab-e on">Details</e>\
+          <e class="PGP-tab-e slip">Slip Gaji</e>\
+        </d>'
+      }
+  // fix 1,000 -> 1000
+  function fxn(x){return parseInt(x.replace(/,/g,''),10)}
+  h+='\
+  <d class=PGP-title2></d>\
+  <d class=PGP-graph>\
+    <e class=PGP-graph-e style="width:'+fxn(d[9])/(20000/200)+'px" t="Gj Pokok"></e>\
+    <e class=PGP-graph-e style="width:'+fxn(d[16])/(1000/200)+'px" t="Tunjangan"></e>\
+    <e class=PGP-graph-e style="width:'+fxn(d[32])/(1000/200)+'px" t="Potongan"></e>\
+    <e class=PGP-graph-e style="width:'+fxn(d[34])/(10000/200)
+       +'px" t="Penerimaan Bersih"></e>\
+  </d>'
+  elm.html(h)
+ $('#PANEL,#PGP').show()
+ }
+// start prev
+$('#PGD').on('click','.PGD-d',function(){PGP($(this))})
+
+ 
+ 
+ 
+ 
+ 
+ 
+ // generate slip
+$('#PGP').on('click','.PGP-tab-e.slip',function(){PGS()})
+function PGS(){
+  var d=__gaji[_xid3()].split('~')
+  var h='\
+      <img class="PGS-d Logo" src="res/dd.png">\
+      <d class="PGS-d Judul">SLIP GAJI</d>\
+      <d class="PGS-d Yys">Yys. Pendidikan Dompet Dhuafa</d>\
+      <d class="PGS-d Nama">'+d[2]+'</d>\
+      <d class="PGS-d Jabatan">'+d[5]+'</d>\
+      <d class="PGS-d NIK">'+d[0]+'</d>\
+      <d class="PGS-d Pembayaran">Bulan Januari 2015</d>\
+      <d class="PGS-d Divisi">'+d[4]+'</d>\
+      <d class="PGS-d Jobclass">'+d[6]+'</d>\
+      <d class="PGS-d Penerimaanutama">Jumlah (Rp)</d>\
+      <d class="PGS-d Gajipokok">'+d[9]+'</d>\
+      <d class="PGS-d Tunjjabatan">'+d[10]+'</d>\
+      <d class="PGS-d Tunjtransport">'+d[11]+'</d>\
+      <d class="PGS-d Tunjkonsumsi">'+d[12]+'</d>\
+      <d class="PGS-d Tunjdaerah">'+d[13]+'</d>\
+      <d class="PGS-d Tunjdplk">'+d[14]+'</d>\
+      <d class="PGS-d Tunjlain">'+d[15]+'</d>\
+      <d class="PGS-d Strip1"></d>\
+      <d class="PGS-d Totalpenerimaanutama">'+d[16]+'</d>\
+      <d class="PGS-d Penerimaanlain">Jumlah (Rp)</d>\
+      <d class="PGS-d Dinas">'+d[18]+'</d>\
+      <d class="PGS-d Lembur">'+d[19]+'</d>\
+      <d class="PGS-d Bonusktt">'+d[20]+'</d>\
+      <d class="PGS-d Enrichment">'+d[21]+'</d>\
+      <d class="PGS-d Ekskul">'+d[22]+'</d>\
+      <d class="PGS-d Totalpenerimaanlain">'+d[23]+'</d>\
+      <d class="PGS-d Potongan">Jumlah (Rp)</d>\
+      <d class="PGS-d Potkoperasi">'+d[24]+'</d>\
+      <d class="PGS-d Potktt">'+d[25]+'</d>\
+      <d class="PGS-d Potnatura">'+d[26]+'</d>\
+      <d class="PGS-d Potkas">'+d[27]+'</d>\
+      <d class="PGS-d Potum">'+d[28]+'</d>\
+      <d class="PGS-d Potdplk">'+d[29]+'</d>\
+      <d class="PGS-d Potarisan">'+d[30]+'</d>\
+      <d class="PGS-d Potziswaf">'+d[31]+'</d>\
+      <d class="PGS-d Totalpotongan">'+d[33]+'</d>\
+      <d class="PGS-d Pembulatan">'+d[35]+'</d>\
+      <d class="PGS-d Penerimaanbersih">'+d[36]+'</d>\
+      <d class="PGS-d Keterangan">'+d[38]+'</d>\
+      <d class="PGS-d Tunaitransfer">'+d[41]+' rek.'+d[42]+'</d>\
+      <d class="PGS-d Dibuatoleh">HRD</d>\
+      <d class="PGS-d Diterimaoleh">'+d[2]+'</d>\
+      <d class="PGS-d Line1"></d>\
+      <d class="PGS-d Line2"></d>\
+      <d class="PGS-d Line3"></d>\
+      <d class="PGS-d Info">'+D.getFullYear()+' &copy; HRIS/YPDD '+Date.now()+'</d>'
+  $('#PGS').html(h)
+  $('#PGS,.PGS-panel').show()
+}
+ 
+$('.PGS-panel').on('click',function(){
+  $('#PGS,.PGS-panel').hide()
+})
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+
+
+/* preview next/prev */
+$('#PGP').on('click','.PGP-prev',function(){ PG_selectUp()
+  $('#PGD').children('.on').click() })
+$('#PGP').on('click','.PGP-next',function(){ PG_selectDown()
+  $('#PGD').children('.on').click() })
+
+
+ 
+
+
+
+
+
+
+
+
+
+</script>
+
+
+

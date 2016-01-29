@@ -1,0 +1,23 @@
+{
+  "name": "hris",
+  "version": "0.0.9",
+  "description": "HRIS_ YPDD",
+  "scripts": {
+    "start": "node start.js"
+  },
+  "main": "start.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hidrox/hris.git"
+  },
+  "author": "fxr (c) 2016",
+  "license": "HAHA",
+  "dependencies": {
+    "bauer-zip": "^1.0.2",
+    "good": "^6.4.0",
+    "good-console": "^5.2.0",
+    "hapi": "^11.1.4",
+    "inert": "^3.2.0",
+    "bcryptjs": "^2.3.0"
+  }
+}

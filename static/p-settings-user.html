@@ -1,0 +1,76 @@
+
+<style>
+            .Settings-div{position:relative;margin:30px 0 0 0;padding:40px 0 0 0;width:500px;}
+            .Settings-div:before{margin:-40px 0 0 0;content:attr(text);color:#888;font:700 19px hell;}
+              
+            .PG-settings label{display:table;height:16px;white-space:pre;}
+            .PG-settings input{position:absolute;left:200px;font:400 11px hell;}
+            .PG-settings input[type=password],
+            .PG-settings input[type=text]{margin:0 0 0 0;height:14px;width:200px;background:none;font:400 12px hell;
+             cursor:text;border-bottom:#006078 solid 1px;color:#007197;}
+
+            .PG-settings .notifInterval{width:50px!important;}
+
+            .Settings-users-item{display:table;height:18px;color:#666;}
+            .Settings-users-item-no{position:absolute;left:-10px;width:30px;text-align:right;}
+            .Settings-users-item-nam{position:absolute;left:30px;}
+            .Settings-users-item-NIK{position:absolute;left:230px;}
+            .Settings-users-item-dep{position:absolute;left:310px;}
+            .Settings-users-item-jab{position:absolute;left:400px;white-space:nowrap;}
+            .Settings-users-item:hover > .Settings-users-item-nam{border-bottom:#555 dotted 1px;cursor:pointer;}
+            .Settings-users-item:hover > .Settings-users-item-jab:after{margin:2px 0 0 6px;
+             border:transparent solid 4px;border-right:#888 solid 4px}
+
+</style>
+
+
+
+<div class=Settings-div text="User Settings">
+<label class=cur-help><input type=password class=changeAdmPass>1.  Change User Password</label>
+</div>
+
+
+
+
+
+
+<script>
+
+
+$('.changeAdmPass').on('blur',function(){
+  var v=$(this).val()
+  if(v.length<1)return false;
+  $.ajax({
+  type:'post',
+  url:'/_edit_password',
+  data:{data:v},
+  success:function(r){
+    PUP(r)
+  },
+  error:function(){
+    PUP('Connection error.')
+  }
+  })
+})
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
