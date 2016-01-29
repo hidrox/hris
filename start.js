@@ -1,19 +1,21 @@
 
+/*
+ * HRIS ypdd
+ * fxr (c) 2016/1/29
+ */
 
 'use strict';
-
-// dev
-function L(s){console.log('---> %j',s)}
-
 const Hapi    =require('hapi');
 const Good    =require('good');
 const Path    =require('path');
 const Inert   =require('inert');
 const Fs      =require('fs');
-//const CryptoJS=require('crypto-js');
 const Bcrypt  =require('bcryptjs');
 const Salt    =Bcrypt.genSaltSync(0);
 const Zip     =require('bauer-zip');
+
+// dev
+function L(s){console.log('---> %j',s)}
 
 /*
  * backup,
@@ -30,11 +32,7 @@ function __backup(comment){
   Zip.zip('port','_backup/'+F+'.'+comment+'.hris')
   console.log('Backup Success: '+F+'.'+comment+'.hris');
 } 
-__backup('server')
-
-
-
-
+__backup('server');
 
 
 /*
@@ -48,14 +46,9 @@ const server=new Hapi.Server({
     }
   }
 });
-
-//const HOST = process.env.OPENSHIFT_APP_DNS || 'x'
-const HOST = env.NODE_IP || 'smart'
-const PORT = env.NODE_PORT || 90
-
 server.connection({
-  host:HOST,
-  port:PORT
+  host: process.env.NODE_IP || 'smart',
+  port: process.env.NODE_PORT || 90
 });
 server.register(Inert,()=>{});
 server.register({
